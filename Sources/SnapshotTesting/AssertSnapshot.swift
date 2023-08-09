@@ -274,7 +274,7 @@ public func verifySnapshot<Value, Format>(
       }
       #endif
 
-      guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+      guard let (failure, attachments, images) = snapshotting.diffing.diff(reference, diffable) else {
         return nil
       }
 
@@ -285,6 +285,8 @@ public func verifySnapshot<Value, Format>(
       try fileManager.createDirectory(at: artifactsSubUrl, withIntermediateDirectories: true)
       let failedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent(snapshotFileUrl.lastPathComponent)
       try snapshotting.diffing.toData(diffable).write(to: failedSnapshotFileUrl)
+      let diffedSnapshotFileUrl = artifactsSubUrl.appendingPathComponent("diff_" + snapshotFileUrl.lastPathComponent)
+      try images.first?.pngData()?.write(to: diffedSnapshotFileUrl)
 
       if !attachments.isEmpty {
         #if !os(Linux) && !os(Windows)
